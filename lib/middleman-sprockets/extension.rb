@@ -94,6 +94,9 @@ module Middleman
           r.path.sub(%r{^#{app.config[:css_dir]}\/}, '')
         end
 
+        # Skip .gitkeep files
+        next sum if sprockets_path.end_with?('.gitkeep')
+
         sprockets_resource = generate_resource(r.path, r.source_file, sprockets_path)
         sum << sprockets_resource
 
