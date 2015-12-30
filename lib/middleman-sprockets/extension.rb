@@ -19,7 +19,6 @@ module Middleman
 
     def after_configuration
       @environment.append_path((app.source_dir + app.config[:js_dir]).to_s)
-      @environment.append_path((app.source_dir + app.config[:css_dir]).to_s)
 
       append_paths_from_gems
 
@@ -84,14 +83,12 @@ module Middleman
 
     def manipulate_resource_list(resources)
       sprockets, non_sprockets = resources.partition do |r|
-        base_resource?(r) && (js?(r) || css?(r))
+        base_resource?(r) && js?(r)
       end
 
       non_sprockets + sprockets.reduce([]) do |sum, r|
         sprockets_path = if js?(r)
           r.path.sub(%r{^#{app.config[:js_dir]}\/}, '')
-        else
-          r.path.sub(%r{^#{app.config[:css_dir]}\/}, '')
         end
 
         # Skip .gitkeep files
@@ -222,7 +219,7 @@ module Middleman
     def append_paths_from_gems
       root_paths = rubygems_latest_specs.map(&:full_gem_path) << app.root
       base_paths = %w[assets app app/assets vendor vendor/assets lib lib/assets]
-      asset_dirs = %w[javascripts js stylesheets css images img fonts]
+      asset_dirs = %w[javascripts js images img fonts]
 
       root_paths.product(base_paths.product(asset_dirs)).each do |root, (base, asset)|
         path = File.join(root, base, asset)
